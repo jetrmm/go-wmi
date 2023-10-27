@@ -368,7 +368,7 @@ func (c *Client) loadEntity(dst interface{}, src *ole.IDispatch) (errFieldMismat
 			f = f.Elem()
 		}
 
-		if prop.VT == 0x1 { //VT_NULL
+		if prop.VT == 0x1 { // VT_NULL
 			continue
 		}
 

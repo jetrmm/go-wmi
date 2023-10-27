@@ -208,17 +208,17 @@ func _TestMemoryWMISimple(t *testing.T) {
 	limit := 500000
 	fmt.Printf("Benchmark Iterations: %d (Memory should stabilize around 7MB after ~3000)\n", limit)
 	var privateMB, allocMB, allocTotalMB float64
-	//var dst []Win32_PerfRawData_PerfDisk_LogicalDisk
-	//q := CreateQuery(&dst, "")
+	// var dst []Win32_PerfRawData_PerfDisk_LogicalDisk
+	// q := CreateQuery(&dst, "")
 	for i := 0; i < limit; i++ {
 		privateMB, allocMB, allocTotalMB = GetMemoryUsageMB()
 		if i%1000 == 0 {
-			//privateMB, allocMB, allocTotalMB = GetMemoryUsageMB()
+			// privateMB, allocMB, allocTotalMB = GetMemoryUsageMB()
 			fmt.Printf("Time: %4ds  Count: %5d  Private Memory: %5.1fMB  MemStats.Alloc: %4.1fMB  MemStats.TotalAlloc: %5.1fMB\n", time.Now().Sub(start)/time.Second, i, privateMB, allocMB, allocTotalMB)
 		}
-		//Query(q, &dst)
+		// Query(q, &dst)
 	}
-	//privateMB, allocMB, allocTotalMB = GetMemoryUsageMB()
+	// privateMB, allocMB, allocTotalMB = GetMemoryUsageMB()
 	fmt.Printf("Final Time: %4ds  Private Memory: %5.1fMB  MemStats.Alloc: %4.1fMB  MemStats.TotalAlloc: %5.1fMB\n", time.Now().Sub(start)/time.Second, privateMB, allocMB, allocTotalMB)
 }
 
@@ -250,9 +250,9 @@ func _TestMemoryWMIConcurrent(t *testing.T) {
 	}()
 	go func() {
 		for i := 0; i > -limit; i-- {
-			//if i%500 == 0 {
+			// if i%500 == 0 {
 			//	fmt.Println(i)
-			//}
+			// }
 			var dst []Win32_OperatingSystem
 			q := CreateQuery(&dst, "")
 			err := Query(q, &dst)
@@ -263,8 +263,8 @@ func _TestMemoryWMIConcurrent(t *testing.T) {
 		wg.Done()
 	}()
 	wg.Wait()
-	//privateMB, allocMB, allocTotalMB := GetMemoryUsageMB()
-	//fmt.Printf("Final Private Memory: %5.1fMB  MemStats.Alloc: %4.1fMB  MemStats.TotalAlloc: %5.1fMB\n", privateMB, allocMB, allocTotalMB)
+	// privateMB, allocMB, allocTotalMB := GetMemoryUsageMB()
+	// fmt.Printf("Final Private Memory: %5.1fMB  MemStats.Alloc: %4.1fMB  MemStats.TotalAlloc: %5.1fMB\n", privateMB, allocMB, allocTotalMB)
 }
 
 var lockthread sync.Mutex
@@ -277,7 +277,7 @@ func getRSS(url string, xmlhttp *ole.IDispatch, MinimalTest bool) (int, error) {
 
 	// call using url,nil to see memory leak
 	if xmlhttp == nil {
-		//Initialize inside loop if not passed in from outer section
+		// Initialize inside loop if not passed in from outer section
 		lockthread.Lock()
 		defer lockthread.Unlock()
 		runtime.LockOSThread()
@@ -292,23 +292,23 @@ func getRSS(url string, xmlhttp *ole.IDispatch, MinimalTest bool) (int, error) {
 		}
 		defer ole.CoUninitialize()
 
-		//fmt.Println("CreateObject Microsoft.XMLHTTP")
+		// fmt.Println("CreateObject Microsoft.XMLHTTP")
 		unknown, err := oleutil.CreateObject("Microsoft.XMLHTTP")
 		if err != nil {
 			return 0, err
 		}
 		defer func() { refcount1 += xmlhttp.Release() }()
 
-		//Memory leak occurs here
+		// Memory leak occurs here
 		xmlhttp, err = unknown.QueryInterface(ole.IID_IDispatch)
 		if err != nil {
 			return 0, err
 		}
 		defer func() { refcount2 += xmlhttp.Release() }()
-		//Nothing below this really matters. Can be removed if you want a tighter loop
+		// Nothing below this really matters. Can be removed if you want a tighter loop
 	}
 
-	//fmt.Printf("Download %s\n", url)
+	// fmt.Printf("Download %s\n", url)
 	openRaw, err := oleutil.CallMethod(xmlhttp, "open", "GET", url, false)
 	if err != nil {
 		return 0, err
@@ -319,7 +319,7 @@ func getRSS(url string, xmlhttp *ole.IDispatch, MinimalTest bool) (int, error) {
 		return 1, nil
 	}
 
-	//Initiate http request
+	// Initiate http request
 	sendRaw, err := oleutil.CallMethod(xmlhttp, "send", nil)
 	if err != nil {
 		return 0, err
@@ -380,14 +380,14 @@ func _TestMemoryOLE(t *testing.T) {
 
 	start := time.Now()
 	limit := 50000000
-	url := "http://localhost/slashdot.xml" //http://rss.slashdot.org/Slashdot/slashdot"
+	url := "http://localhost/slashdot.xml" // http://rss.slashdot.org/Slashdot/slashdot"
 	fmt.Printf("Benchmark Iterations: %d (Memory should stabilize around 8MB to 12MB after ~2k full or 250k minimal)\n", limit)
 
-	//On Server 2016 or Windows 10 changing leakMemory=true will cause it to leak ~1.5MB per 10000 calls to unknown.QueryInterface
+	// On Server 2016 or Windows 10 changing leakMemory=true will cause it to leak ~1.5MB per 10000 calls to unknown.QueryInterface
 	leakMemory := true
 
-	////////////////////////////////////////
-	//Start outer section
+	// //////////////////////////////////////
+	// Start outer section
 	var unknown *ole.IUnknown
 	var xmlhttp *ole.IDispatch
 	if !leakMemory {
@@ -403,22 +403,22 @@ func _TestMemoryOLE(t *testing.T) {
 		}
 		defer ole.CoUninitialize()
 
-		//fmt.Println("CreateObject Microsoft.XMLHTTP")
+		// fmt.Println("CreateObject Microsoft.XMLHTTP")
 		unknown, err = oleutil.CreateObject("Microsoft.XMLHTTP")
 		if err != nil {
 			t.Fatal(err)
 		}
 		defer unknown.Release()
 
-		//Memory leak starts here
+		// Memory leak starts here
 		xmlhttp, err = unknown.QueryInterface(ole.IID_IDispatch)
 		if err != nil {
 			t.Fatal(err)
 		}
 		defer xmlhttp.Release()
 	}
-	//End outer section
-	////////////////////////////////////////
+	// End outer section
+	// //////////////////////////////////////
 
 	totalItems := uint64(0)
 	for i := 0; i < limit; i++ {
@@ -426,9 +426,9 @@ func _TestMemoryOLE(t *testing.T) {
 			privateMB, allocMB, allocTotalMB := GetMemoryUsageMB()
 			fmt.Printf("Time: %4ds  Count: %7d  Private Memory: %5.1fMB  MemStats.Alloc: %4.1fMB  MemStats.TotalAlloc: %5.1fMB  %7d/%7d\n", time.Now().Sub(start)/time.Second, i, privateMB, allocMB, allocTotalMB, refcount1, refcount2)
 		}
-		//This should use less than 10MB for 1 million iterations if xmlhttp was initialized above
-		//On Server 2016 or Windows 10 changing leakMemory=true above will cause it to leak ~1.5MB per 10000 calls to unknown.QueryInterface
-		count, err := getRSS(url, xmlhttp, true) //last argument is for Minimal test. Doesn't effect leak just overall allocations/time
+		// This should use less than 10MB for 1 million iterations if xmlhttp was initialized above
+		// On Server 2016 or Windows 10 changing leakMemory=true above will cause it to leak ~1.5MB per 10000 calls to unknown.QueryInterface
+		count, err := getRSS(url, xmlhttp, true) // last argument is for Minimal test. Doesn't effect leak just overall allocations/time
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -450,7 +450,7 @@ var (
 
 func GetMemoryUsageMB() (float64, float64, float64) {
 	runtime.ReadMemStats(&mMemoryUsageMB)
-	//errGetMemoryUsageMB = nil //Query(qGetMemoryUsageMB, &dstGetMemoryUsageMB) float64(dstGetMemoryUsageMB[0].WorkingSetPrivate)
+	// errGetMemoryUsageMB = nil //Query(qGetMemoryUsageMB, &dstGetMemoryUsageMB) float64(dstGetMemoryUsageMB[0].WorkingSetPrivate)
 	errGetMemoryUsageMB = Query(qGetMemoryUsageMB, &dstGetMemoryUsageMB)
 	if errGetMemoryUsageMB != nil {
 		fmt.Println("ERROR GetMemoryUsage", errGetMemoryUsageMB)

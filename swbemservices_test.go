@@ -26,7 +26,7 @@ func TestWbemQuery(t *testing.T) {
 	if count < 1 {
 		t.Fatal("Query1: no results found for lsass.exe")
 	}
-	//fmt.Printf("dst[0].ProcessID=%d\n", dst[0].ProcessId)
+	// fmt.Printf("dst[0].ProcessID=%d\n", dst[0].ProcessId)
 
 	q2 := CreateQuery(&dst, "WHERE name='svchost.exe'")
 	errQuery = s.Query(q2, &dst)
@@ -37,9 +37,9 @@ func TestWbemQuery(t *testing.T) {
 	if count < 1 {
 		t.Fatal("Query2: no results found for svchost.exe")
 	}
-	//for index, item := range dst {
+	// for index, item := range dst {
 	//	fmt.Printf("dst[%d].ProcessID=%d\n", index, item.ProcessId)
-	//}
+	// }
 	errClose := s.Close()
 	if errClose != nil {
 		t.Fatalf("Close: %s", errClose)
@@ -101,8 +101,8 @@ func WbemGetMemoryUsageMB(s *SWbemServices) (float64, float64, float64) {
 	return float64(dstGetMemoryUsageMB[0].WorkingSetPrivate) / MB, float64(mMemoryUsageMB.Alloc) / MB, float64(mMemoryUsageMB.TotalAlloc) / MB
 }
 
-//Run all benchmarks (should run for at least 60s to get a stable number):
-//go test -run=NONE -bench=Version -benchtime=120s
+// Run all benchmarks (should run for at least 60s to get a stable number):
+// go test -run=NONE -bench=Version -benchtime=120s
 
 // Individual benchmarks:
 // go test -run=NONE -bench=NewVersion -benchtime=120s
